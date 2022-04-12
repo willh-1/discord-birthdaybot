@@ -23,7 +23,7 @@ async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
 # loop to get birthday
-@tasks.loop(minutes=0.2)
+@tasks.loop(minutes=1)
 async def change_status(channel):
     today = date.today().strftime("%d.%m")
     # day/month
