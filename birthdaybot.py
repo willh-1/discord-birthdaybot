@@ -90,13 +90,12 @@ async def on_message(message):
     # deleting a specific users birthday
     if message.content.startswith('$bday delete'):
         user = message.content.split('$bday delete ')[1].split(' ')[0]
-        bday = message.content.split('$bday delete ')[1].split(' ')[1]
-        results = collection.find({"name": name})
+        results = collection.find({"name": user})
         if results.count() < 1:
             answer = "There are no birthdays with that name."
             await message.channel.send(answer)
         else:
-            collection.delete_one({"name": name})
+            collection.delete_one({"name": user})
             await message.channel.send("Birthday deleted")
     
     # deleting all the birthdays stored (mostly for testing)
