@@ -27,7 +27,7 @@ async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
 # loop to get birthday
-@tasks.loop(minutes=1)
+@tasks.loop(minutes=0.5)
 async def change_status(channel):
     today = date.today().strftime("%d.%m")
     # day/month
@@ -41,7 +41,7 @@ async def change_status(channel):
         print("name: ", name)
         if (today == birthday["bday"]):
             message = "@everyone It's " + name + "'s birthday!! \n"
-            if (current_time == "18:24"):
+            if (current_time == "02:39"):
                 await channel.send(message)
     
 
