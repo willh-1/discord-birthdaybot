@@ -17,7 +17,7 @@ collection = db["UserData"]
 
 @client.event
 async def on_ready():
-    channel = client.get_channel(918642140379250742)
+    channel = client.get_channel(229796952383029251)
     print('channel', channel)
     change_status.start(channel)
     print('We have logged in as {0.user}'.format(client))
