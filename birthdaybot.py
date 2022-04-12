@@ -4,12 +4,8 @@ import pymongo
 from pymongo import MongoClient
 import os
 from datetime import date, datetime
-# from dotenv import load_dotenv
 
-# load_dotenv()
-
-# reading token from text file
-#token = open("token.txt", "r").read()
+# reading token and mongodb url from heroku config vars
 token = os.getenv("token")
 url = os.getenv("url")
 
@@ -41,7 +37,7 @@ async def change_status(channel):
         print("name: ", name)
         if (today == birthday["bday"]):
             message = "@everyone It's " + name + "'s birthday!! \n"
-            if (current_time == "02:46"):
+            if (current_time == "16:00"):
                 await channel.send(message)
     
 
