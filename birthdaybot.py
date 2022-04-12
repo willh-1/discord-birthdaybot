@@ -41,7 +41,7 @@ async def change_status(channel):
         print("name: ", name)
         if (today == birthday["bday"]):
             message = "@everyone It's " + name + "'s birthday!! \n"
-            if (current_time == "02:39"):
+            if (current_time == "02:42"):
                 await channel.send(message)
     
 
