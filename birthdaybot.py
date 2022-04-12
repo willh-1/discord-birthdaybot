@@ -4,9 +4,9 @@ import pymongo
 from pymongo import MongoClient
 import os
 from datetime import date, datetime
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
 
 # reading token from text file
 #token = open("token.txt", "r").read()
