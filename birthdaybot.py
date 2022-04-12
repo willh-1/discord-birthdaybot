@@ -91,7 +91,7 @@ async def on_message(message):
     if message.content.startswith('$bday delete'):
         user = message.content.split('$bday delete ')[1].split(' ')[0]
         results = collection.find({"name": user})
-        if results.count() < 1:
+        if results.count_documents() < 1:
             answer = "There are no birthdays with that name."
             await message.channel.send(answer)
         else:
