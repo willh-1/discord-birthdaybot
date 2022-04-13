@@ -5,6 +5,10 @@ from pymongo import MongoClient
 import os
 from datetime import date, datetime
 
+# uncomment for local testing loading token and url from .env
+# from dotenv import load_dotenv
+# load_dotenv()
+
 # reading token and mongodb url from heroku config vars
 token = os.getenv("token")
 url = os.getenv("url")
