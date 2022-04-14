@@ -6,8 +6,8 @@ import os
 from datetime import date, datetime
 
 # uncomment for local testing loading token and url from .env
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
 # reading token and mongodb url from heroku config vars or from .env if self hosting
 token = os.getenv("token")
