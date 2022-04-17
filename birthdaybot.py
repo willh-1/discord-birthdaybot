@@ -5,7 +5,7 @@ from pymongo import MongoClient
 import os
 from datetime import date, datetime
 
-# uncomment for local testing loading token and url from .env
+# uncomment for self hosting, needed to load token and url from .env
 # from dotenv import load_dotenv
 # load_dotenv()
 
@@ -13,9 +13,9 @@ from datetime import date, datetime
 token = os.getenv("token")
 url = os.getenv("url")
 
-# client = discord.Client()
 client = commands.Bot(command_prefix = '$bday ')
 
+# MongoDB connection
 cluster = MongoClient(url)
 db = cluster["UserData"]
 collection = db["UserData"]
@@ -86,11 +86,11 @@ async def delete(ctx, user):
 # command that lists all the birthdays known
 @client.command()
 async def list(ctx):
-    message = 'All birthdays I know: \n'
+    message = "All birthdays I know: \n"
     # print(collection.find({}).sort('bday', 1))
     for birthday in collection.find({"serverID": ctx.guild.id}).sort('bday', 1):
         name = birthday["name"]
-        message = message + name + " " + birthday['bday'] + '\n'
+        message = message + name + " " + birthday['bday'] + "\n"
 
     print(message)
     await ctx.channel.send(message)
@@ -102,6 +102,22 @@ async def test(ctx):
     answer = "It's <@" + author + ">'s birthday!!\n"
     await ctx.channel.send(answer)
 
+# command to bring up all commands bot knows
+@client.command()
+async def commands(ctx):
+    embed = discord.Embed(
+        title = "All available commands:",
+        color = discord.Colour.blue()
+    )
+    embed.add_field(name="$bday add @user DD.MM", value="Add a users birthday", inline=False)
+    embed.add_field(name="$bday delete @user ", value="Delete a users birthday", inline=False)
+    embed.add_field(name="$bday list", value="Lists all known birthdays", inline=False)
+    embed.add_field(name="$bday test", value="Sends a test message", inline=True)
+    embed.add_field(name="$bday commands", value="Brings up this list of commands", inline=False)
+    embed.add_field(name="$bday deleteall", value="Deletes all known birthdays in server. \nONLY ADMINS CAN USE THIS", inline=False)
+    
+    await ctx.send(embed=embed)
+
 # command to delete all birthdays from db (mostly for testing)
 @client.command()
 async def deleteall(ctx):
@@ -112,65 +128,5 @@ async def deleteall(ctx):
     else:
         await ctx.channel.send('Only admins are allowed to delete all')
 
-""" @client.event
-async def on_message(message):
-    # ignore messages from bot itself
-    if message.author == client.user:
-        return
 
-    # test command
-    if message.content.startswith('$bday test'):
-        author = str(message.author.id)
-        answer = "It's <@" + author + ">'s birthday!!\n"
-        await message.channel.send(answer)
-    
-    if message.content.startswith('$bday setmy'):
-        bday = message.content.split('$bday setmy ')[1]
-        print(bday)
-        post = {"name": message.author.id, "bday": bday}
-        # db_key = str(message.author.id)
-        # db[db_key] = bday
-        collection.insert_one(post)
-
-        answer = 'I set the birthday for you, ' + message.author.name + '!'
-        await message.channel.send(answer)
-
-    # setting birthdays for users
-    if message.content.startswith('$bday setfor'):
-        user = message.content.split('$bday setfor ')[1].split(' ')[0]
-        bday = message.content.split('$bday setfor ')[1].split(' ')[1]
-        print('user', user)
-        print('bday', bday)
-        post = {"name": user, "bday": bday}
-        collection.insert_one(post)
-
-        answer = 'I set the birthday for ' + user + '!'
-        await message.channel.send(answer)
-
-    # getting all the birthdays stored in database
-    if message.content.startswith('$bday list'):
-        answer = 'All birthdays I know: \n'
-        for birthday in collection.find({}).sort('bday', 1):
-            name = birthday["name"]
-            answer = answer + name + " " + birthday['bday'] + '\n'
-
-        print(answer)
-        await message.channel.send(answer)
-
-    # deleting a specific users birthday
-    if message.content.startswith('$bday delete'):
-        user = message.content.split('$bday delete ')[1].split(' ')[0]
-        result_count = collection.count_documents({"name": user})
-        if result_count < 1:
-            answer = "There are no birthdays with that name."
-            await message.channel.send(answer)
-        else:
-            collection.delete_one({"name": user})
-            await message.channel.send("Birthday deleted")
-    
-    # deleting all the birthdays stored (mostly for testing)
-    if message.content.startswith('$bday removeall'):
-        collection.delete_many({})
-        await message.channel.send('Deleted all birthdays')
- """
 client.run(token)
