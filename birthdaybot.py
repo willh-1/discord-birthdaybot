@@ -26,7 +26,7 @@ async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
 # loops every minute to check the time of day
-# grabs the birthdays that are current date
+# grabs the birthdays in database that are current date
 # for each birthday, the channelID stored will be the channel that the birthday announcement will be made
 # announces the message at 16:00 UTC if there is a birthday today
 @tasks.loop(minutes=1)
