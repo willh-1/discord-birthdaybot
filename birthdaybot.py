@@ -13,7 +13,7 @@ from datetime import date, datetime
 token = os.getenv("token")
 url = os.getenv("url")
 
-client = commands.Bot(command_prefix = '$bday ')
+client = commands.Bot(command_prefix = '!bday ')
 
 # MongoDB connection
 cluster = MongoClient(url)
@@ -22,16 +22,16 @@ collection = db["UserData"]
 
 @client.event
 async def on_ready():
-    #channel = client.get_channel(481316592475701248)
-    #print('channel', channel)
     change_status.start()
     print('We have logged in as {0.user}'.format(client))
 
-# loop to get birthday
+# loops every minute to check the time of day
+# grabs the birthdays that are current date
+# for each birthday, the channelID stored will be the channel that the birthday announcement will be made
+# announces the message at 16:00 UTC if there is a birthday today
 @tasks.loop(minutes=1)
 async def change_status():
     today = date.today().strftime("%d.%m")
-    # day/month
     print("today's date: ", today)
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")[:-3]
@@ -73,7 +73,6 @@ async def add(ctx, user, bday):
 # command to delete a user's birthday
 @client.command()
 async def delete(ctx, user):
-    # user = message.content.split('$bday delete ')[1].split(' ')[0]
     result_count = collection.count_documents({"name": user})
     # user not found in db
     if result_count < 1:
@@ -87,11 +86,9 @@ async def delete(ctx, user):
 @client.command()
 async def list(ctx):
     message = "All birthdays I know: \n"
-    # print(collection.find({}).sort('bday', 1))
     for birthday in collection.find({"serverID": ctx.guild.id}).sort('bday', 1):
         name = birthday["name"]
         message = message + name + " " + birthday['bday'] + "\n"
-
     print(message)
     await ctx.channel.send(message)
 
@@ -121,9 +118,10 @@ async def commands(ctx):
 # command to delete all birthdays from db (mostly for testing)
 @client.command()
 async def deleteall(ctx):
-    # checks that person using command is an admin
+    # checks that person using command has administrator priviledges
     if ctx.message.author.guild_permissions.administrator:
-        collection.delete_many({})
+        # only deletes birthdays from that specific discord server
+        collection.delete_many({"serverID": ctx.guild.id})
         await ctx.channel.send('All birthdays have been deleted')
     else:
         await ctx.channel.send('Only admins are allowed to delete all')
