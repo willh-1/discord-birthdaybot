@@ -9,12 +9,14 @@ This bot can be self hosted or with the use of an online hosting services such a
 ### MongoDB
 The bot uses MongoDB to store the users birthdays. 
 
-[This guide](https://www.mongodb.com/developer/how-to/use-atlas-on-heroku/) is useful to follow up until step 5 if you wish to self-host to grab the URL. Continue following the guide if you are planning on using Heroku to host the bot for you.
+[This guide](https://www.mongodb.com/developer/how-to/use-atlas-on-heroku/) is useful to follow up until step 5 if you're going to self-host as it tells you how to set up the account and where to get the MongoDB URL. 
+
+Continue following the guide if you are planning on using Heroku to host the bot for you.
 
 ### Self-Hosting
 When self hosting there are comments that need to be uncommented so that your bot token and MongoDB URL is readable from your .env file.
 
-Inside your .env file should have:
+Your .env file should include:
 ```
 token=BOT_TOKEN_HERE
 url="MONGODB_URL_HERE"
