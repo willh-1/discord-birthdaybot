@@ -106,12 +106,12 @@ async def commands(ctx):
         title = "All available commands:",
         color = discord.Colour.blue()
     )
-    embed.add_field(name="$bday add @user DD.MM", value="Add a users birthday", inline=False)
-    embed.add_field(name="$bday delete @user ", value="Delete a users birthday", inline=False)
-    embed.add_field(name="$bday list", value="Lists all known birthdays", inline=False)
-    embed.add_field(name="$bday test", value="Sends a test message", inline=True)
-    embed.add_field(name="$bday commands", value="Brings up this list of commands", inline=False)
-    embed.add_field(name="$bday deleteall", value="Deletes all known birthdays in server. \nONLY ADMINS CAN USE THIS", inline=False)
+    embed.add_field(name="!bday add @user DD.MM", value="Add a users birthday", inline=False)
+    embed.add_field(name="!bday delete @user ", value="Delete a users birthday", inline=False)
+    embed.add_field(name="!bday list", value="Lists all known birthdays", inline=False)
+    embed.add_field(name="!bday test", value="Sends a test message", inline=True)
+    embed.add_field(name="!bday commands", value="Brings up this list of commands", inline=False)
+    embed.add_field(name="!bday deleteall", value="Deletes all known birthdays in server. \nONLY ADMINS CAN USE THIS", inline=False)
     
     await ctx.send(embed=embed)
 
