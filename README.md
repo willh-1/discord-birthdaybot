@@ -20,7 +20,7 @@ token=BOT_TOKEN_HERE
 url="MONGODB_URL_HERE"
 ```
 
-### Online Hosting
+### Online Hosting Services
 When using an online hosting service such as Heroku, there will probably be a way for you to store the bot token and MongoDB URL. In Heroku, it is in the settings "config vars." For other hosting services, follow their specific guide on where to store the bot token and MondoDB URL.
 
 ### Bot Commands
