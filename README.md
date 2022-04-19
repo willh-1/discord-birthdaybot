@@ -1,5 +1,5 @@
 
-# Python Discord BirthdayBot
+# Discord BirthdayBot
 
 This Discord bot helps servers track their user's birthdays and stores them in MongoDB.
 
