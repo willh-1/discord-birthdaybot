@@ -13,7 +13,7 @@ load_dotenv()
 token = os.getenv("token")
 url = os.getenv("url")
 
-client = commands.Bot(command_prefix = '!bday ')
+client = commands.Bot(command_prefix = "!bday ", help_command = None)
 
 # MongoDB connection
 cluster = MongoClient(url)
@@ -22,8 +22,9 @@ collection = db["UserData"]
 
 @client.event
 async def on_ready():
+    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name = "!bday help"))
     change_status.start()
-    print('We have logged in as {0.user}'.format(client))
+    print("We have logged in as {0.user}".format(client))
 
 # loops every minute to check the time of day
 # grabs the birthdays in database that are current date
@@ -43,11 +44,13 @@ async def change_status():
         print("name: ", name)
         print("channel: ", channel)
         if (today == birthday["bday"]):
-            message = "@everyone It's " + name + "'s birthday!! \n"
+            message = "@everyone It's " + name + "'s birthday!! <:feelsbirthdayman:478595418620690446>\n"
             # announce at 16:00 UTC
             if (current_time == "16:00"):
-                await channel.send(message)
-
+                emoji = '<:feelsbirthdayman:478595418620690446>'
+                bdaymsg = await channel.send(message)
+                await bdaymsg.add_reaction(emoji)
+                
 # command to add a user's birthday
 @client.command()
 async def add(ctx, user, bday):
@@ -113,22 +116,24 @@ async def list(ctx):
 @client.command()
 async def test(ctx):
     author = str(ctx.author.id)
-    answer = "It's <@" + author + ">'s birthday!!\n"
-    await ctx.channel.send(answer)
+    message = "@everyone It's <@" + author + ">'s birthday!! <:feelsbirthdayman:478595418620690446>\n"
+    emoji = '<:feelsbirthdayman:478595418620690446>'
+    bdaymsg = await ctx.channel.send(message)
+    await bdaymsg.add_reaction(emoji)
 
 # command to bring up all commands bot knows
 @client.command()
-async def commands(ctx):
+async def help(ctx):
     embed = discord.Embed(
         title = "All available commands:",
         color = discord.Colour.blue()
     )
     embed.add_field(name="!bday add @user MM.DD", value="Add a users birthday", inline=False)
     embed.add_field(name="!bday delete @user ", value="Delete a users birthday", inline=False)
-    embed.add_field(name="!bday edit @user ", value="Edit a users birthday", inline=False)
+    embed.add_field(name="!bday edit @user MM.DD", value="Edit a users birthday", inline=False)
     embed.add_field(name="!bday list", value="Lists all known birthdays", inline=False)
     embed.add_field(name="!bday test", value="Sends a test message", inline=True)
-    embed.add_field(name="!bday commands", value="Brings up this list of commands", inline=False)
+    embed.add_field(name="!bday help", value="Brings up this list of commands", inline=False)
     embed.add_field(name="!bday deleteall", value="Deletes all known birthdays in server. \nONLY ADMINS CAN USE THIS", inline=False)
     
     await ctx.send(embed=embed)
