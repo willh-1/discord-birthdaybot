@@ -6,8 +6,8 @@ import os
 from datetime import date, datetime
 
 # uncomment for self hosting, needed to load token and url from .env
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 # reading token and mongodb url from heroku config vars or from .env if self hosting
 token = os.getenv("token")
@@ -31,7 +31,7 @@ async def on_ready():
 # announces the message at 16:00 UTC if there is a birthday today
 @tasks.loop(minutes=1)
 async def change_status():
-    today = date.today().strftime("%d.%m")
+    today = date.today().strftime("%m.%d")
     print("today's date: ", today)
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")[:-3]
@@ -53,12 +53,13 @@ async def change_status():
 async def add(ctx, user, bday):
     message = ""
     if len(bday) < 5:
-        message = "Incorrect birthday format: DD.MM"
+        message = "Incorrect birthday format. Correct format is: MM.DD"
         await ctx.channel.send(message)
     # users birthday already exists in db
     # user can be in other servers that also has this bot, should be able to save birthdays to that server aswell
     elif (collection.count_documents({"name": user})) and (collection.count_documents({"serverID": ctx.guild.id}))  == 1 :
-        await ctx.channel.send(user + "'s birthday already exists")
+        message = user + "'s birthday already exists"
+        await ctx.channel.send(message)
     else:
         post = {
             "name": user,
@@ -73,22 +74,38 @@ async def add(ctx, user, bday):
 # command to delete a user's birthday
 @client.command()
 async def delete(ctx, user):
-    result_count = collection.count_documents({"name": user})
+    result_count = collection.count_documents({"name": user, "serverID": ctx.guild.id})
     # user not found in db
     if result_count < 1:
-        answer = "There are no birthdays with that name."
-        await ctx.channel.send(answer)
+        message = "That user has no birthdays stored."
+        await ctx.channel.send(message)
     else:
         collection.delete_one({"name": user})
         await ctx.channel.send("Birthday deleted")
+
+# command that edits a users birthday
+@client.command()
+async def edit(ctx, user, bday):
+    result_count = collection.count_documents({"name": user, "serverID": ctx.guild.id})
+    if result_count < 1:
+        message = "That user has no birthdays stored"
+        await ctx.channel.send(message)
+    elif len(bday) < 5:
+        message = "Incorrect birthday format. Correct format is: MM.DD"
+        await ctx.channel.send(message)
+    else:
+        collection.update_one({"name": user, "serverID": ctx.guild.id}, {"$set":{"bday": bday}})
+        message = "Users birthday has been updated."
+        await ctx.channel.send(message)
 
 # command that lists all the birthdays known
 @client.command()
 async def list(ctx):
     message = "All birthdays I know: \n"
-    for birthday in collection.find({"serverID": ctx.guild.id}).sort('bday', 1):
+    result = collection.find({"serverID": ctx.guild.id}).sort("bday") 
+    for birthday in result:
         name = birthday["name"]
-        message = message + name + " " + birthday['bday'] + "\n"
+        message = message + name + " " + birthday["bday"] + "\n"
     print(message)
     await ctx.channel.send(message)
 
@@ -106,8 +123,9 @@ async def commands(ctx):
         title = "All available commands:",
         color = discord.Colour.blue()
     )
-    embed.add_field(name="!bday add @user DD.MM", value="Add a users birthday", inline=False)
+    embed.add_field(name="!bday add @user MM.DD", value="Add a users birthday", inline=False)
     embed.add_field(name="!bday delete @user ", value="Delete a users birthday", inline=False)
+    embed.add_field(name="!bday edit @user ", value="Edit a users birthday", inline=False)
     embed.add_field(name="!bday list", value="Lists all known birthdays", inline=False)
     embed.add_field(name="!bday test", value="Sends a test message", inline=True)
     embed.add_field(name="!bday commands", value="Brings up this list of commands", inline=False)
