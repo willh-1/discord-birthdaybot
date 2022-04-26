@@ -22,6 +22,7 @@ collection = db["UserData"]
 
 @client.event
 async def on_ready():
+    # Changes bot presences to "listening to !bday help"
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name = "!bday help"))
     change_status.start()
     print("We have logged in as {0.user}".format(client))
@@ -37,6 +38,7 @@ async def change_status():
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")[:-3]
     print("Current Time =", current_time)
+    # Check in database for birthdays that are for current day
     results = collection.find({"bday": today})
     for birthday in results:
         name = birthday["name"]
@@ -50,12 +52,21 @@ async def change_status():
                 emoji = '<:feelsbirthdayman:478595418620690446>'
                 bdaymsg = await channel.send(message)
                 await bdaymsg.add_reaction(emoji)
-                
+
+# function that ensures date inputted follows format: MM.DD
+def is_valid_date(bday):
+    try:
+        # ensures birthday includes zero-padded numbers. ie 01.01 vs 1.1
+        if bday != datetime.strptime(bday, "%m.%d").strftime("%m.%d"):
+            raise ValueError
+        return True
+    except ValueError:
+        return False     
+
 # command to add a user's birthday
 @client.command()
 async def add(ctx, user, bday):
-    message = ""
-    if len(bday) < 5:
+    if is_valid_date(bday) == False:
         message = "Incorrect birthday format. Correct format is: MM.DD"
         await ctx.channel.send(message)
     # users birthday already exists in db
@@ -93,7 +104,7 @@ async def edit(ctx, user, bday):
     if result_count < 1:
         message = "That user has no birthdays stored"
         await ctx.channel.send(message)
-    elif len(bday) < 5:
+    elif is_valid_date(bday) == False:
         message = "Incorrect birthday format. Correct format is: MM.DD"
         await ctx.channel.send(message)
     else:
@@ -148,6 +159,5 @@ async def deleteall(ctx):
         await ctx.channel.send('All birthdays have been deleted')
     else:
         await ctx.channel.send('Only admins are allowed to delete all')
-
 
 client.run(token)
