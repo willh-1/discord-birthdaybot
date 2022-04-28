@@ -23,7 +23,7 @@ url="MONGODB_URL_HERE"
 ```
 
 ### Online Hosting Services
-When using an online hosting service such as Heroku, there will probably be a way for you to store the bot token and MongoDB URL. In Heroku, it is in the settings "config vars." For other hosting services, follow their specific guide on where to store the bot token and MondoDB URL.
+When using an online hosting service such as Heroku, there will probably be a way for you to store the bot token and MongoDB URL in a secure environment. In Heroku, it is in the settings "config vars." For other hosting services, look up/follow their specific guide on where to store the bot token and MondoDB URL.
 
 ### Bot Commands
 The bot comes with these following commands:
@@ -53,9 +53,9 @@ Description: Lists all known birthdays in current server
 Usage: !bday test
 Description: Sends a test message to let people know bot is working
 ````
-#### !bday commands
+#### !bday help
 ````
-Usage: !bday commands
+Usage: !bday help
 Description: Lists all the commands known to the bot and how to use them
 ````
 #### !bday deleteall

@@ -27,10 +27,8 @@ async def on_ready():
     change_status.start()
     print("We have logged in as {0.user}".format(client))
 
-# loops every minute to check the time of day
-# grabs the birthdays in database that are current date
-# for each birthday, the channelID stored will be the channel that the birthday announcement will be made
-# announces the message at 16:00 UTC if there is a birthday today
+# check if today's date matches any birthdays stored in database
+# when dates match, send the birthday message in the correct channel of the server(s) at 16:00 UTC
 @tasks.loop(minutes=1)
 async def change_status():
     today = date.today().strftime("%m.%d")
@@ -49,9 +47,7 @@ async def change_status():
             message = "@everyone It's " + name + "'s birthday!! <:feelsbirthdayman:478595418620690446>\n"
             # announce at 16:00 UTC
             if (current_time == "16:00"):
-                emoji = '<:feelsbirthdayman:478595418620690446>'
-                bdaymsg = await channel.send(message)
-                await bdaymsg.add_reaction(emoji)
+                await channel.send(message)
 
 # function that ensures date inputted follows format: MM.DD
 def is_valid_date(bday):
@@ -66,10 +62,10 @@ def is_valid_date(bday):
 # command to add a user's birthday
 @client.command()
 async def add(ctx, user, bday):
+    # calls function that checks if date entered is valid
     if is_valid_date(bday) == False:
         message = "Incorrect birthday format. Correct format is: MM.DD"
         await ctx.channel.send(message)
-    # users birthday already exists in db
     # user can be in other servers that also has this bot, should be able to save birthdays to that server aswell
     elif (collection.count_documents({"name": user})) and (collection.count_documents({"serverID": ctx.guild.id}))  == 1 :
         message = user + "'s birthday already exists"
