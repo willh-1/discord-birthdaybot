@@ -49,19 +49,16 @@ async def change_status():
             if (current_time == "16:00"):
                 await channel.send(message)
 
-# function that ensures date inputted follows format: MM.DD
-def is_valid_date(bday):
-    try:
-        # ensures birthday includes zero-padded numbers. ie 01.01 vs 1.1
-        if bday != datetime.strptime(bday, "%m.%d").strftime("%m.%d"):
-            raise ValueError
-        return True
-    except ValueError:
-        return False     
-
 # command to add a user's birthday
 @client.command()
-async def add(ctx, user, bday):
+async def add(ctx, user: discord.Member, bday=None):
+    # checks if birthday is included or not
+    if bday is None:
+        message = "You forgot to include a date"
+        await ctx.channel.send(message)
+        return
+    # converts discord.Member int format into string to be stored in database
+    user = "<@" + str(user.id) + ">"    
     # calls function that checks if date entered is valid
     if is_valid_date(bday) == False:
         message = "Incorrect birthday format. Correct format is: MM.DD"
@@ -70,7 +67,7 @@ async def add(ctx, user, bday):
     elif (collection.count_documents({"name": user})) and (collection.count_documents({"serverID": ctx.guild.id}))  == 1 :
         message = user + "'s birthday already exists"
         await ctx.channel.send(message)
-    else:
+    elif user:
         post = {
             "name": user,
             "bday": bday,
@@ -80,10 +77,14 @@ async def add(ctx, user, bday):
         collection.insert_one(post)
         print("Birthday added")
         await ctx.channel.send(user + "'s birthday was added")
-    
+    else:
+        message = "You forgot to include a birthday"
+        await ctx.channel.send(message)
+
 # command to delete a user's birthday
 @client.command()
-async def delete(ctx, user):
+async def delete(ctx, user: discord.Member):
+    user = "<@" + str(user.id) + ">"
     result_count = collection.count_documents({"name": user, "serverID": ctx.guild.id})
     # user not found in db
     if result_count < 1:
@@ -95,10 +96,14 @@ async def delete(ctx, user):
 
 # command that edits a users birthday
 @client.command()
-async def edit(ctx, user, bday):
+async def edit(ctx, user: discord.Member, bday=None):
+    user = "<@" + str(user.id) + ">"
     result_count = collection.count_documents({"name": user, "serverID": ctx.guild.id})
     if result_count < 1:
         message = "That user has no birthdays stored"
+        await ctx.channel.send(message)
+    elif bday is None:
+        message = "You forgot to include a date to replace the old birthday"
         await ctx.channel.send(message)
     elif is_valid_date(bday) == False:
         message = "Incorrect birthday format. Correct format is: MM.DD"
@@ -155,5 +160,21 @@ async def deleteall(ctx):
         await ctx.channel.send('All birthdays have been deleted')
     else:
         await ctx.channel.send('Only admins are allowed to delete all')
+        
+# function that ensures date inputted follows format: MM.DD
+def is_valid_date(bday):
+    try:
+        # ensures birthday includes zero-padded numbers. ie 01.01 vs 1.1
+        if bday != datetime.strptime(bday, "%m.%d").strftime("%m.%d"):
+            raise ValueError
+        return True
+    except ValueError:
+        return False   
+
+# error check that ensures "user" in commands are users in the server
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.errors.MemberNotFound):
+        return await ctx.send("This user is not in the server.")
 
 client.run(token)
