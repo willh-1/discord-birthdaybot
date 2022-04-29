@@ -32,17 +32,17 @@ The bot comes with these following commands:
 #### !bday add
 ````
 Usage: !bday add @user MM.DD
-Description: Adds users birthday
+Description: Add a user's birthday
 ````
 #### !bday delete
 ````
 Usage: !bday delete @user
-Description: Deletes user birthday
+Description: Delete a user's birthday
 ````
 #### !bday edit
 ````
 Usage: !bday edit @user MM.DD
-Description: Edit users birthday to a new birthday
+Description: Edit a user's birthday to a new birthday
 ````
 #### !bday list
 ````
