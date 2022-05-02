@@ -5,7 +5,7 @@ from pymongo import MongoClient
 import os
 from datetime import date, datetime
 
-# uncomment for self hosting, needed to load token and url from .env
+# next two lines might need to be commented if not self-hosting as it could potentially cause conflicts with service provider
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -13,6 +13,7 @@ load_dotenv()
 token = os.getenv("token")
 url = os.getenv("url")
 
+# setting the bot command prefix that it will listen to
 client = commands.Bot(command_prefix = "!bday ", help_command = None)
 
 # MongoDB connection
@@ -77,9 +78,6 @@ async def add(ctx, user: discord.Member, bday=None):
         collection.insert_one(post)
         print("Birthday added")
         await ctx.channel.send(user + "'s birthday was added")
-    else:
-        message = "You forgot to include a birthday"
-        await ctx.channel.send(message)
 
 # command to delete a user's birthday
 @client.command()
